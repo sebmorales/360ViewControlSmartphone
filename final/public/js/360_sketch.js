@@ -1,22 +1,28 @@
 var zRot, xRot, yRot;
 var socket = io();
+var socketActive=false;
 
-
+//SOCKETS CODE
 socket.on('connect', function(){
     console.log("Socket connected");
-    //Some three.js crazy shit happening!!
 });
-
+//data from server
 socket.on('serverData', function(data){
     var dataParsed = data.split(',');
+		xRot=dataParsed[0];
+		yRot=dataParsed[1];
     zRot=dataParsed[2];
-    yRot=dataParsed[1];
-    xRot=dataParsed[0];
+		socketActive=true;
     //console.log("x: "+xRot+" y: "+yRot+" z: "+zRot);
 });
+//SOCKETS CODE FINISH
 
 
-
+//Threejs code starts:
+var gravity=true;
+var oldGravity=true;
+//var worldTexture="white.jpg";
+var worldTexture="image.jpg";
 
 var camera, scene, renderer;
 
@@ -30,17 +36,17 @@ init();
 animate();
 
 function init() {
-	var container, mesh;
+	var container, mesh, material,geometry;
 	container = document.getElementById( 'container' );
 	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 	camera.target = new THREE.Vector3( 0, 0, 0 );
 	scene = new THREE.Scene();
 
-	var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+	geometry = new THREE.SphereGeometry( 500, 60, 40 );
 	geometry.scale( - 1, 1, 1 );
 
-	var material = new THREE.MeshBasicMaterial( {
-		map: new THREE.TextureLoader().load( 'image.jpg' )
+	material = new THREE.MeshBasicMaterial( {
+	map: new THREE.TextureLoader().load( worldTexture )
 	} );
 
 	mesh = new THREE.Mesh( geometry, material );
@@ -55,22 +61,16 @@ function init() {
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 	document.addEventListener( 'wheel', onDocumentMouseWheel, false );
-
-	//
-
 	document.addEventListener( 'dragover', function ( event ) {
 		event.preventDefault();
 		event.dataTransfer.dropEffect = 'copy';
 	}, false );
-
 	document.addEventListener( 'dragenter', function ( event ) {
 		document.body.style.opacity = 0.5;
 	}, false );
-
 	document.addEventListener( 'dragleave', function ( event ) {
 		document.body.style.opacity = 1;
 	}, false );
-
 	document.addEventListener( 'drop', function ( event ) {
 		event.preventDefault();
 		var reader = new FileReader();
@@ -79,7 +79,7 @@ function init() {
 			material.map.needsUpdate = true;
 		}, false );
 
-		reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
+	reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
 		document.body.style.opacity = 1;
 	}, false );
 	//
@@ -127,22 +127,34 @@ function update() {
 	if ( isUserInteracting === false ) {
 		//lon += 0.1;
 	}
+	if(!socketActive){
+		lat = Math.max( - 85, Math.min( 85, lat ) );
+		phi = THREE.Math.degToRad( 90 - lat );
+		theta = THREE.Math.degToRad( lon );
+	}else{
+		// lat = Math.max( - 85, Math.min( 85, lat ) );
+		// phi = THREE.Math.degToRad( 90 - lat );
+		// theta = THREE.Math.degToRad( lon );
+	  lat = THREE.Math.degToRad(yRot);
+		phi = THREE.Math.degToRad(xRot-90);
+		theta = THREE.Math.degToRad(zRot);
+	}
 
-	// lat = Math.max( - 85, Math.min( 85, lat ) );
-	// phi = THREE.Math.degToRad( 90 - lat );
-	// theta = THREE.Math.degToRad( lon );
+  if (gravity==false){
+    phi = THREE.Math.degToRad(xRot);
+		camera.fov=150;
+		if(oldGravity!=gravity){
+			oldGravity=gravity;
+			camera.updateProjectionMatrix();
+		}
+  }
 
-	lat = THREE.Math.degToRad(yRot);
-	phi = THREE.Math.degToRad(xRot-90);
-	theta = THREE.Math.degToRad(zRot);
+
 	camera.target.x = 500 * Math.sin( phi ) * Math.cos( theta );
 	camera.target.y = -500 * Math.cos( phi );
 	camera.target.z = 500 * Math.sin( phi ) * Math.sin( theta );
 	camera.rotateZ(zRot);
 	camera.lookAt( camera.target );
-	/*
-	// distortion
-	camera.position.copy( camera.target ).negate();
-	*/
 	renderer.render( scene, camera );
+	socketActive=false;
 }
