@@ -30,7 +30,7 @@ function draw(){
   rotations=xRot+","+yRot+","+zRot;
   //rotations="{ \"x\":"+xRot+",\"y\":"+yRot+",\"z\":"+zRot+"}";//json
 
-  var range=0.01;
+  var range=0.005;
   var change=false;
   if(oldxRot-range<xRot && oldxRot+range>xRot){
     change=false;

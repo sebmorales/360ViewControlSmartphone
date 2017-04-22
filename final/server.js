@@ -14,6 +14,16 @@ var server = app.listen(port);
 //Sockets
 var socket = require('socket.io').listen(server);
 
+//OSC
+var osc = require('node-osc');
+var oscServer = new osc.Server(3333, '127.0.0.1');
+var to360fromIsa,oldIsadorato360;
+
+
+
+// var serverOSC = socket.connect('http://localhost/osc/servers/8000'),
+//   clientOSC = socket.connect('http://localhost/osc/clients/8000');
+
 console.log("Server running and listening at port " + port);
 
 //Setup public lib
@@ -47,7 +57,22 @@ socket.on('connection', function(client){
         socket.sockets.emit("serverData", num);
     });
 
+    client.on('message', function(message){
+        console.log('Isadora Sent: ' + message);
+    });
+
     client.on('disconnect', function(){
         console.log("A user dissconected");
     });
+});
+
+oscServer.on("message", function (msg, rinfo) {
+    //   console.log("TUIO message:");
+    //console.log(msg[1]);
+    to360fromIsa=msg[1];
+
+    if(to360fromIsa!=oldIsadorato360){
+        oldIsadorato360=to360fromIsa;
+        socket.sockets.emit("scene", to360fromIsa);
+    }
 });

@@ -1,6 +1,9 @@
 var zRot, xRot, yRot;
 var socket = io();
 var socketActive=false;
+var sceneNum=0;
+var oldSceneNum=0;
+
 
 //SOCKETS CODE
 socket.on('connect', function(){
@@ -15,6 +18,11 @@ socket.on('serverData', function(data){
 		socketActive=true;
     //console.log("x: "+xRot+" y: "+yRot+" z: "+zRot);
 });
+
+socket.on('scene', function(data){
+    sceneNum=data;
+		console.log(sceneNum);
+});
 //SOCKETS CODE FINISH
 
 
@@ -25,6 +33,7 @@ var oldGravity=true;
 var worldTexture="image.jpg";
 
 var camera, scene, renderer;
+var container, mesh, material,geometry;
 
 var isUserInteracting = false,
 onMouseDownMouseX = 0, onMouseDownMouseY = 0,
@@ -36,18 +45,19 @@ init();
 animate();
 
 function init() {
-	var container, mesh, material,geometry;
 	container = document.getElementById( 'container' );
 	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 	camera.target = new THREE.Vector3( 0, 0, 0 );
 	scene = new THREE.Scene();
 
-	geometry = new THREE.SphereGeometry( 500, 60, 40 );
+	//geometry = new THREE.SphereGeometry( 500, 60, 40 );
+	geometry = new THREE.SphereGeometry( 50,30, 20 );
 	geometry.scale( - 1, 1, 1 );
 
 	material = new THREE.MeshBasicMaterial( {
 	map: new THREE.TextureLoader().load( worldTexture )
 	} );
+  // material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
 	mesh = new THREE.Mesh( geometry, material );
 	scene.add( mesh );
@@ -123,22 +133,50 @@ function animate() {
 }
 
 function update() {
+	if(sceneNum!=oldSceneNum){
+		oldSceneNum=sceneNum;
+		if(sceneNum==1){
+			worldTexture="white.jpg";
+			mesh.material = new THREE.MeshBasicMaterial( {
+			map: new THREE.TextureLoader().load(worldTexture )
+			} );
+			mesh.material.map.needsUpdate = true;
+
+		}
+		if(sceneNum==2){
+			worldTexture="image.jpg";
+			mesh.material = new THREE.MeshBasicMaterial( {
+			map: new THREE.TextureLoader().load(worldTexture )
+			} );
+			mesh.material.map.needsUpdate = true;
+
+		}
+		if(sceneNum==3){
+			mesh.material = new THREE.MeshBasicMaterial( { wireframe: true } );
+			mesh.material.needsUpdate = true;
+		}
+	}
+
 
 	if ( isUserInteracting === false ) {
 		//lon += 0.1;
 	}
-	if(!socketActive){
-		lat = Math.max( - 85, Math.min( 85, lat ) );
-		phi = THREE.Math.degToRad( 90 - lat );
-		theta = THREE.Math.degToRad( lon );
-	}else{
-		// lat = Math.max( - 85, Math.min( 85, lat ) );
-		// phi = THREE.Math.degToRad( 90 - lat );
-		// theta = THREE.Math.degToRad( lon );
-	  lat = THREE.Math.degToRad(yRot);
-		phi = THREE.Math.degToRad(xRot-90);
-		theta = THREE.Math.degToRad(zRot);
-	}
+	// if(!socketActive){
+	// 	lat = Math.max( - 85, Math.min( 85, lat ) );
+	// 	phi = THREE.Math.degToRad( 90 - lat );
+	// 	theta = THREE.Math.degToRad( lon );
+	// }else{
+	// 	// lat = Math.max( - 85, Math.min( 85, lat ) );
+	// 	// phi = THREE.Math.degToRad( 90 - lat );
+	// 	// theta = THREE.Math.degToRad( lon );
+	//   lat = THREE.Math.degToRad(yRot);
+	// 	phi = THREE.Math.degToRad(xRot-90);
+	// 	theta = THREE.Math.degToRad(zRot);
+	// }
+
+  lat = THREE.Math.degToRad(yRot);
+  phi = THREE.Math.degToRad(xRot-90);
+  theta = THREE.Math.degToRad(zRot);
 
   if (gravity==false){
     phi = THREE.Math.degToRad(xRot);

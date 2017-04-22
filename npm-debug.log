@@ -1,5 +1,5 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'run', 'start' ]
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'start' ]
 2 info using npm@2.15.1
 3 info using node@v4.4.3
 4 verbose config Skipping project config: /Users/SebastianRev1/.npmrc. (matches userconfig)
@@ -7,7 +7,7 @@
 5 verbose stack     at Error (native)
 6 verbose cwd /Users/SebastianRev1/Dropbox/ITP/Semester2/SenseMeMoveMe/SMMMFinal_ProjectorControl
 7 error Darwin 14.5.0
-8 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "run" "start"
+8 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "start"
 9 error node v4.4.3
 10 error npm  v2.15.1
 11 error path /Users/SebastianRev1/package.json
