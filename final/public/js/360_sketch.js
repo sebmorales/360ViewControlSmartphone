@@ -1,4 +1,5 @@
 var zRot, xRot, yRot;
+var oldZ,oldX,oldY;
 var socket = io();
 var socketActive=false;
 var sceneNum=0;
@@ -12,9 +13,11 @@ socket.on('connect', function(){
 //data from server
 socket.on('serverData', function(data){
     var dataParsed = data.split(',');
-		xRot=dataParsed[0];
-		yRot=dataParsed[1];
-    zRot=dataParsed[2];
+		xRot=Number(dataParsed[0]);
+		yRot=Number(dataParsed[1]);
+    zRot=Number(dataParsed[2]);
+
+
 		socketActive=true;
     //console.log("x: "+xRot+" y: "+yRot+" z: "+zRot);
 });
@@ -25,12 +28,14 @@ socket.on('scene', function(data){
 });
 //SOCKETS CODE FINISH
 
-
 //Threejs code starts:
 var gravity=true;
 var oldGravity=true;
 //var worldTexture="white.jpg";
-var worldTexture="image.jpg";
+// var worldTexture="clouds.jpg";
+//var worldTexture="dunesE.jpg";
+var wTextures=["dunes5.jpg","dunesE.jpg","sky2.jpg"]
+var worldTexture=wTextures[1];
 
 var camera, scene, renderer;
 var container, mesh, material,geometry;
@@ -50,6 +55,13 @@ function init() {
 	camera.target = new THREE.Vector3( 0, 0, 0 );
 	scene = new THREE.Scene();
 
+	oldX=Number(10.0);
+	oldY=Number(10.0);
+	oldZ=Number(10.0);
+
+	xRot=10.0;
+	yRot=10.0;
+	zRot=10.0;
 	//geometry = new THREE.SphereGeometry( 500, 60, 40 );
 	geometry = new THREE.SphereGeometry( 50,30, 20 );
 	geometry.scale( - 1, 1, 1 );
@@ -135,16 +147,25 @@ function animate() {
 function update() {
 	if(sceneNum!=oldSceneNum){
 		oldSceneNum=sceneNum;
-		if(sceneNum==1){
-			worldTexture="white.jpg";
+		if(sceneNum==0){
+			worldTexture=wTextures[sceneNum];
 			mesh.material = new THREE.MeshBasicMaterial( {
 			map: new THREE.TextureLoader().load(worldTexture )
 			} );
 			mesh.material.map.needsUpdate = true;
 
 		}
+		if(sceneNum==1){
+			worldTexture=wTextures[sceneNum];
+			mesh.material = new THREE.MeshBasicMaterial( {
+			map: new THREE.TextureLoader().load(worldTexture )
+			} );
+			mesh.material.map.needsUpdate = true;
+
+		}
+
 		if(sceneNum==2){
-			worldTexture="image.jpg";
+			worldTexture=wTextures[sceneNum];
 			mesh.material = new THREE.MeshBasicMaterial( {
 			map: new THREE.TextureLoader().load(worldTexture )
 			} );
@@ -161,25 +182,36 @@ function update() {
 	if ( isUserInteracting === false ) {
 		//lon += 0.1;
 	}
-	// if(!socketActive){
-	// 	lat = Math.max( - 85, Math.min( 85, lat ) );
-	// 	phi = THREE.Math.degToRad( 90 - lat );
-	// 	theta = THREE.Math.degToRad( lon );
-	// }else{
-	// 	// lat = Math.max( - 85, Math.min( 85, lat ) );
-	// 	// phi = THREE.Math.degToRad( 90 - lat );
-	// 	// theta = THREE.Math.degToRad( lon );
-	//   lat = THREE.Math.degToRad(yRot);
-	// 	phi = THREE.Math.degToRad(xRot-90);
-	// 	theta = THREE.Math.degToRad(zRot);
-	// }
+	if(Math.abs(oldX-xRot)>350){
+		oldX=xRot;
+	}
+	if(Math.abs(oldY-yRot)>350){
+		oldY=yRot;
+	}
+	if(Math.abs(oldZ-zRot)>350){
+		oldZ=zRot;
+	}
 
-  lat = THREE.Math.degToRad(yRot);
-  phi = THREE.Math.degToRad(xRot-90);
-  theta = THREE.Math.degToRad(zRot);
+
+	if(oldX!=xRot){
+		//console.log(oldX+" "+xRot);
+		oldX=(Number(oldX)*9.5+Number(xRot)*0.5)/10.0;
+	}
+	if(oldY!=yRot){
+		//console.log(oldX+" "+xRot);
+		oldY=(Number(oldY)*9.5+Number(yRot)*0.50)/10.0;
+	}
+	if(oldZ!=zRot){
+		oldZ=(Number(oldZ)*9.5+Number(zRot)*0.50)/10.0;
+	}
+	//console.log(Number(oldX)+" "+Number(oldY)+" "+Number(oldZ));
+
+  lat = THREE.Math.degToRad(oldY);
+  phi = THREE.Math.degToRad(oldX-90);
+  theta = THREE.Math.degToRad(oldZ);
 
   if (gravity==false){
-    phi = THREE.Math.degToRad(xRot);
+    phi = THREE.Math.degToRad(oldX);
 		camera.fov=150;
 		if(oldGravity!=gravity){
 			oldGravity=gravity;
@@ -189,7 +221,7 @@ function update() {
 
 
 	camera.target.x = 500 * Math.sin( phi ) * Math.cos( theta );
-	camera.target.y = -500 * Math.cos( phi );
+	camera.target.y = -500 * Math.cos( phi )+300;
 	camera.target.z = 500 * Math.sin( phi ) * Math.sin( theta );
 	camera.rotateZ(zRot);
 	camera.lookAt( camera.target );

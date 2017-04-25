@@ -1,28 +1,18 @@
 //Express
 var express = require('express');
 var app = express();
-
 //ejs
 var ejs = require('ejs');
-
 //HTTP and creating our awasome server
 var http = require('http').createServer(app);
-
 var port = process.env.PORT || 3000;
 var server = app.listen(port);
-
 //Sockets
 var socket = require('socket.io').listen(server);
-
 //OSC
 var osc = require('node-osc');
 var oscServer = new osc.Server(3333, '127.0.0.1');
 var to360fromIsa,oldIsadorato360;
-
-
-
-// var serverOSC = socket.connect('http://localhost/osc/servers/8000'),
-//   clientOSC = socket.connect('http://localhost/osc/clients/8000');
 
 console.log("Server running and listening at port " + port);
 
