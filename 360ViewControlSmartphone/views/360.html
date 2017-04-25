@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Cleaning Piece</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				cursor: none !important;
+			}
+			canvas{z-index: 1 !important;}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				font-weight: bold;
+				text-align:center;
+			}
+			img.image {
+				position: absolute !important;
+				top: 0px; left:0; width: 100%; height:100%;
+				z-index: 2 !important;
+			}​
+
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"></div>
+		<script src="http://threejs.org/build/three.js"></script>
+		<script src="js/socket.min.js"></script>
+		<script src="js/360_sketch.js"></script>
+		<img class="image" src='gradient.png'></img>​
+
+	</body>
+</html>

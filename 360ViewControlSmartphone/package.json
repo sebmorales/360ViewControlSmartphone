@@ -1,0 +1,18 @@
+{
+  "name": "360ViewControlSmartphone",
+  "version": "1.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.5.6",
+    "express": "^4.15.2",
+    "http": "0.0.0",
+    "node-osc": "^2.1.0",
+    "socket.io": "^1.7.3"
+  }
+}

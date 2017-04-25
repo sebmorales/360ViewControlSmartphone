@@ -25,12 +25,7 @@ app.set("views", __dirname + '/views');
 app.engine('.html', ejs.__express);
 app.set('view-engine', 'html');
 
-
 //Router
-app.get("/projector", function(req, res){
-    res.render("projector.html");
-});
-
 app.get("/phone", function(req, res){
     res.render("phone.html")
 });
@@ -39,20 +34,14 @@ app.get("/360", function(req, res){
 });
 
 socket.on('connection', function(client){
-    console.log("we have a new user");
-
+    //console.log("we have a new user");
     client.on('rotations', function(number){
         //console.log('Getting rotations ' + number);
         var num = number;
         socket.sockets.emit("serverData", num);
     });
-
-    client.on('message', function(message){
-        console.log('Isadora Sent: ' + message);
-    });
-
     client.on('disconnect', function(){
-        console.log("A user dissconected");
+        //console.log("A user dissconected");
     });
 });
 
@@ -60,7 +49,6 @@ oscServer.on("message", function (msg, rinfo) {
     //   console.log("TUIO message:");
     //console.log(msg[1]);
     to360fromIsa=msg[1];
-
     if(to360fromIsa!=oldIsadorato360){
         oldIsadorato360=to360fromIsa;
         socket.sockets.emit("scene", to360fromIsa);
